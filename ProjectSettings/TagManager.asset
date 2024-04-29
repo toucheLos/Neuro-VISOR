@@ -9,6 +9,7 @@ TagManager:
   - Ruler
   - NeuronContainer
   - CellPreviewer
+  - Neuron
   layers:
   - Default
   - TransparentFX

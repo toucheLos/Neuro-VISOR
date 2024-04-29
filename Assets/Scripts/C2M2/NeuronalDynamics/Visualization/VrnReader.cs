@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -9,6 +10,7 @@ using Grid = C2M2.NeuronalDynamics.UGX.Grid;
 
 namespace C2M2.NeuronalDynamics.Visualization.VRN
 {
+    
     public class VrnReader
     {
 
@@ -99,6 +101,8 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
         /// Note the load is only done if the corresponding archive has not yet been loaded
         /// <see cref="Geom1d"> 1D Geometries </see>
         /// <see cref="Geom2d"> 2D Geoemtries </see>
+        /// private string newText;
+      
         private void Load()
         {
             // Load if not already loaded
@@ -107,18 +111,43 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
             // Helper function to do the actual loading
             void DoLoad()
             {
-                using (ZipArchive archive = ZipFile.OpenRead($"{this.fileName}"))
+                try
                 {
-                    var file = archive.GetEntry("MetaInfo.json");
-                    _ = file ??
-                        throw new CouldNotReadMeshFromVRNArchive(nameof(file));
-                    geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd());
-                    loaded = true;
-                    metaInfo = new MetaInfo(geometry.ARCHIVE, geometry.SPECIES, geometry.STRAIN);
+                    using (ZipArchive archive = ZipFile.OpenRead($"{this.fileName}"))
+                    {
+                        var file = archive.GetEntry("MetaInfo.json");
+                        _ = file ??
+                            throw new CouldNotReadMeshFromVRNArchive(nameof(file));
+                        geometry = JsonUtility.FromJson<Geometry>(new StreamReader(file.Open()).ReadToEnd());
+                        loaded = true;
+                        metaInfo = new MetaInfo(geometry.ARCHIVE, geometry.SPECIES, geometry.STRAIN);
+                    }
+                }
+                catch(FileNotFoundException)
+                {
+                    int index = this.fileName.LastIndexOf("\\");
+                    GameObject obj = GameObject.FindGameObjectWithTag("CellPreviewer");
+                   Transform obf = obj.transform.Find(this.fileName.Substring(index + 1) + "Preview");
+                   Transform obm = obf.transform.Find("Window/Walls/FrontWall/FrontInfo");
+                   TMPro.TextMeshProUGUI textmesh =  obm.transform.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>();
+                    string text = textmesh.text;
+                    Color color = textmesh.color;
+
+                    textmesh.color = Color.red;
+                    textmesh.text = "Error: Please refresh";
+                    
+                    //MonobehaviorHelper.Instance.ResetTextAndColor(textmesh, text, color, 2f);
+
                 }
             }
         }
+       /* public void monoParser(MonoBehaviour mono, TMPro.TextMeshProUGUI text, string prevtext, Color color)
+        {
+            //We can now use StartCoroutine from MonoBehaviour in a non MonoBehaviour script
+            mono.StartCoroutine(returnOrigionalText(text,prevtext,color));
 
+        }*/
+      
         ///<summary>
         /// Returns the metainfo for the loaded cell geometry
         /// </summary>

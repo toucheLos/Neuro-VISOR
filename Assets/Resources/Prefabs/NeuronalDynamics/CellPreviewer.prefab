@@ -89,8 +89,8 @@ MonoBehaviour:
   - serializedVersion: 2
     rgba: 4286444713
   positionsNorm:
-  - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: -1}
+  - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
   stackPos: 1
 --- !u!1001 &1369221526035555268

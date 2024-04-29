@@ -118,7 +118,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 {
                     // Reenable the cell previewer
                     GameManager.instance.cellPreviewer.SetActive(true);
-
+                    //Reenable the cell previewer controls
+                    Placed.makePreviewerControlsVisible(true);
                     // Destroy this control panel
                     Destroy(transform.root.gameObject);
                 }
@@ -138,7 +139,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
             defaultBackground.SetActive(!minimize);
             minimizedBackground.SetActive(minimize);
-
+            //make cell previewer controls nonvisible
+            Placed.makePreviewerControlsVisible(false);
             // Ensure cell previewer is not present if board is expanded 
             if (!minimize) GameManager.instance.cellPreviewer.SetActive(false);
         }

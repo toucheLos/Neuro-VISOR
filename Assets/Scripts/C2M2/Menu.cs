@@ -436,6 +436,7 @@ namespace C2M2
 
             LoadButtonVisible(true);
             CloseButtonVisible(false);
+
         }
 
         /// <summary>
@@ -454,12 +455,12 @@ namespace C2M2
                     c.MinimizeBoard(true);
                 }
 
-                if (gm.cellPreviewer != null) gm.cellPreviewer.SetActive(false);
+                if (gm.cellPreviewer != null) gm.cellPreviewer.SetActive(false); 
+                
 
                 SaveButtonVisible(false);
                 LoadButtonVisible(false);
                 CloseButtonVisible(true);
-
                 Transform g = gameObject.transform.GetChild(3);
                 for (int i = 0; i < files.Length; i++)
                 {
@@ -486,7 +487,6 @@ namespace C2M2
 
                 filelist_visible = false;
                 LoadButtonVisible(true);
-
                 // if controlPanel is active unminimize it, otherwise show the cell previewer
                 GameObject controlPanel = GameObject.FindGameObjectWithTag("ControlPanel");
                 if (controlPanel != null)
@@ -496,7 +496,9 @@ namespace C2M2
                     SaveButtonVisible(true);
                 }
                 else
+                {
                     gm.cellPreviewer.SetActive(true);
+                }
             }
 
         }
@@ -521,6 +523,7 @@ namespace C2M2
         {
             GameObject close = gameObject.transform.GetChild(2).gameObject;
             close.SetActive(visible);
+
         }
     }
 }
