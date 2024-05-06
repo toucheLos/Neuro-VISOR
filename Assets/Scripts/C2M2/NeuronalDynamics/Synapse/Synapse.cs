@@ -61,7 +61,6 @@ public class Synapse : NDInteractables
         float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
         transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
         SetToModeMaterial();
-        SynapseManager.PrePlaceCheck(this);
     }
 
     protected override void AddHitEventListeners()
@@ -114,7 +113,7 @@ public class Synapse : NDInteractables
         SetToModeMaterial();
     }
 
-    public void SetPrePlaceMat()
+    public void SetPrePlace()
     {
         SwitchMaterial(prePlaceMat);
     }

@@ -58,6 +58,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         if (synapseInProgress == null) //Pre Synapse
         {
             Synapse prePlaced = placedSynapse.Clone();
+            prePlaced.SetPrePlace();
             synapseInProgress = prePlaced;
             placementTimestamp = Time.time;
         }
@@ -65,7 +66,9 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         {
             Synapse postPlaced = placedSynapse.Clone();
             synapses.Add((synapseInProgress, postPlaced));
+            PrePlaceCheck(synapseInProgress);
             synapseInProgress = null;
+
             PlaceArrow();
         }
     }
@@ -99,17 +102,26 @@ public class SynapseManager : NDInteractablesManager<Synapse>
             }
             return true;
         }
-        else return false;
+        else Destroy(syn.gameObject);
+        return false;
     }
 
     public bool PrePlaceCheck(Synapse syn)
     {
         if (FindSynapsePair(syn) == null)
         {
-            syn.SetPrePlaceMat();
+            syn.SetPrePlace();
             return true;
         }
-        else return false;
+        else if (FindSynapsePair(syn) != null)
+        {
+            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            {
+                pair.Item1.SetToModeMaterial();
+                pair.Item2.SetToModeMaterial();
+            }
+        }
+        return false;
     }
 
     public bool ChangeModel(Synapse syn, Synapse.Model model)
