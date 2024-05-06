@@ -82,7 +82,7 @@ public class Synapse : NDInteractables
         if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
         {
             if (SynapseManager.FindSelectedSyn(this).currentModel == Model.GABA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.NMDA);
-            else SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
+            else if (SynapseManager.FindSelectedSyn(this).currentModel == Model.NMDA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
         }
         // Delete synapse
         else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
