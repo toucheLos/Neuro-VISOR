@@ -2663,7 +2663,7 @@ GameObject:
   - component: {fileID: 276891098}
   - component: {fileID: 276891097}
   m_Layer: 8
-  m_Name: GenerateAction
+  m_Name: RefreshAction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2757,7 +2757,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 496120432}
-        m_MethodName: pressButton
+        m_MethodName: refreshPreviewer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4011,6 +4011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c04bf7e5dd141ca438bb2c6e337b7bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  neuronArray: []
 --- !u!1 &528033289
 GameObject:
   m_ObjectHideFlags: 0
@@ -6183,6 +6184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c04bf7e5dd141ca438bb2c6e337b7bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  neuronArray: []
 --- !u!54 &732963081
 Rigidbody:
   m_ObjectHideFlags: 0

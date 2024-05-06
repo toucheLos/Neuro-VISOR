@@ -6,19 +6,19 @@ using System.IO;
 using C2M2.NeuronalDynamics.Interaction;
 using System.Linq;
 using TMPro;
-public class Placed : MonoBehaviour
+public class CellPreviewerController : MonoBehaviour
 {
 
     private static GameObject cellPreviewerObj;
     private static CellPreviewer cellPreviewer;
-    public static GameObject[] neuronArray;
-    public static int cellSize;
-    public static int Page;
-    public static GameObject UpArrow;
-    public static GameObject DownArrow;
-    public static GameObject refresh;
-    public static GameObject pageCounter;
-
+    private static GameObject UpArrow;
+    private static GameObject DownArrow;
+    private static GameObject refresh;
+    private static GameObject pageCounter;
+    private static int cellSize;
+    private static int Page;
+    public GameObject[] neuronArray;
+   
     public void removeNeuroPreview()
     {
         for (int i = cellPreviewerObj.transform.childCount - 1; i > 0; --i)
@@ -26,13 +26,13 @@ public class Placed : MonoBehaviour
             Destroy(cellPreviewerObj.transform.GetChild(i).gameObject);
         }
 
-        cellPreviewer.generateNeuron();
+        cellPreviewer.generateCellPreviewer();
         for (int i = 1; i < cellPreviewerObj.transform.childCount; ++i)
         {
             neuronArray.Append(cellPreviewerObj.transform.GetChild(i).gameObject);
         }
     }
-    public void pressButton()
+    public void refreshPreviewer()
     {
        if (cellPreviewer.newFiles.Count > 0)
         {
@@ -40,15 +40,14 @@ public class Placed : MonoBehaviour
             {
                 cellPreviewer.files.Add(i);
             }
-            UnityEngine.Debug.Log(cellPreviewer.newFiles.Count);
             cellPreviewer.newFiles.Clear();
             cellPreviewer.files.Sort((file1, file2) => file1.Name.CompareTo(file2.Name));
-            UnityEngine.Debug.Log(cellPreviewer.files.GetRange(0, cellPreviewer.files.Count));
 
         }
        cellSize = cellPreviewerObj.GetComponent<CellPreviewer>().positionsNorm.Length * 3;
         removeNeuroPreview();
         changePageNumbers(Page, (int)Math.Ceiling((double)cellPreviewer.files.Count / cellSize));
+       
     }
     public void changePageNumbers(int currentPage, int maxPage)
     {
@@ -59,7 +58,7 @@ public class Placed : MonoBehaviour
                            "<size=100%>{1}</size></align>", currentPage + 1, maxPage);
     }
 
-    public static void makePreviewerControlsVisible(bool hide)
+    public void makePreviewerControlsVisible(bool hide)
     {
         UpArrow.SetActive(hide);
         DownArrow.SetActive(hide);
@@ -91,18 +90,32 @@ public class Placed : MonoBehaviour
 
         }
     }
+    public void setPage(int page)
+    {
+        Page = page;
+    }
+    public int getCellSize()
+    {
+        return cellSize;
+    }
+    public int getPage()
+    {
+        return Page;
+    }
      void Start()
     {
 
 
         cellPreviewerObj = GameObject.FindGameObjectWithTag("CellPreviewer");
         cellPreviewer = cellPreviewerObj.GetComponent<CellPreviewer>();
-        neuronArray = GameObject.FindGameObjectsWithTag("Neuron");
+        for (int i = cellPreviewerObj.transform.childCount - 1; i > 0; --i)
+        {
+            neuronArray.Append(cellPreviewerObj.transform.GetChild(i).gameObject);
+        }
         cellSize = cellPreviewerObj.GetComponent<CellPreviewer>().positionsNorm.Length * 3;
         UpArrow = GameObject.Find("UpArrow");
         DownArrow = GameObject.Find("DownArrow");
         refresh = GameObject.Find("Refresh");
-        
         Page = 0;
         pageCounter = GameObject.Find("Page Counter");
         StartCoroutine(DelayedPageStart(0.1f));

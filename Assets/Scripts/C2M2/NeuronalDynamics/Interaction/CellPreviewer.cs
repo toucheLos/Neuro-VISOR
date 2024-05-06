@@ -28,7 +28,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             public List<FileInfo> files = new List<FileInfo>();
             public List<FileInfo> newFiles = new List<FileInfo>();
             FileSystemWatcher watcher = new FileSystemWatcher();
-
+            CellPreviewerController controller;
 
             /// <summary>
             /// Colors ot use for the 1D cell renderings. More than cellColors.Length cells will repeat these colors
@@ -54,15 +54,12 @@ namespace C2M2.NeuronalDynamics.Interaction
             new Vector3(0, 0, 0),
             new Vector3(0, 0, 1),
             new Vector3(0, 0, -2)
-            /*new Vector3(0, 0, 0),
-            new Vector3(0, 0, 1),
-            new Vector3(0, 0, -1),
-            new Vector3(0, 0, -2),*/
+          
             };
 
             [Tooltip("If true, positionsNorm will stack above and below on the y axis")]
             public bool stackPos = true;
-            public void generateNeuron()
+            public void generateCellPreviewer()
             {
 
                 // Make sure we have window preview prefab and a pointer to a simulation loader
@@ -137,20 +134,21 @@ namespace C2M2.NeuronalDynamics.Interaction
                 {
                     DirectoryInfo d = new DirectoryInfo(targetDir);
                     if (files.Count == 0) { files = d.GetFiles("*.vrn").ToList(); }
-                    int startIndex = Placed.Page * Placed.cellSize;
-                    int range = System.Math.Min(Placed.cellSize, files.Count - startIndex); //Placed.cellSize was subsituted for 9
+                    int pageCount = controller.getPage();
+                    int cellCount = controller.getCellSize();
+                    int startIndex = pageCount * cellCount;
+                    int range = System.Math.Min(cellCount, files.Count - startIndex); 
                     if (files.Count == 0) return new List<string> { };
                     List<string> fileNames = new List<string>();
-                    if (Placed.Page != 0)
+                    if (pageCount != 0)
                     {
-                   // StartCoroutine(delay(startIndex, range));
                         bool success = false;
-                        while (!success && Placed.Page != 0)
+                        while (!success && pageCount != 0)
                         {
 
                             try
                             {
-                                if (System.Math.Min(Placed.cellSize, files.Count - startIndex) > 0) { range = System.Math.Min(Placed.cellSize, files.Count - startIndex); }
+                                if (System.Math.Min(cellCount, files.Count - startIndex) > 0) { range = System.Math.Min(cellCount, files.Count - startIndex); }
                                 else
                                 {
                                     throw new System.ArgumentOutOfRangeException("all files on page deleted");
@@ -163,11 +161,10 @@ namespace C2M2.NeuronalDynamics.Interaction
 
                             catch (System.ArgumentOutOfRangeException)
                             {
-
-                                Placed.Page -= 1;
-                            
-                                startIndex = Placed.Page * Placed.cellSize;
-                                range = System.Math.Min(Placed.cellSize, files.Count - startIndex);
+                                pageCount -= 1;
+                                controller.setPage(pageCount);
+                                startIndex = pageCount * cellCount;
+                                range = System.Math.Min(cellCount, files.Count - startIndex);
                             }
 
                         }
@@ -179,11 +176,11 @@ namespace C2M2.NeuronalDynamics.Interaction
                         }
 
                     }
-                    else if (Placed.Page == 0)
+                    else if (pageCount == 0)
                     {
-                    if (files.Count >= Placed.cellSize)
+                    if (files.Count >= cellCount)
                         {
-                            foreach (FileInfo i in files.GetRange(0, Placed.cellSize))
+                            foreach (FileInfo i in files.GetRange(0,cellCount))
                             {
                                 fileNames.Add(i.Name);
                                 
@@ -199,13 +196,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     }
                     return fileNames;
                 }
-            IEnumerator delay(int startindex, int range)
-            {
-                yield return new WaitForSeconds(.01f);
-                startindex = Placed.Page * Placed.cellSize;
-                range = System.Math.Min(Placed.cellSize, files.Count - startindex);
-
-            }
+           
                 Vector3[] GetWindowPositions(int numWindows)
                 {
                     // Default Example: 0 <= numWindows <= 18
@@ -226,9 +217,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                         if (i < positionsNorm.Length) stackAmount = 1;
                         else if (i < positionsNorm.Length * 2) stackAmount = 0;
                         else if (i < positionsNorm.Length * 3) stackAmount = -1;
-                        /*   if (i < positionsNorm.Length) stackAmount = 0;
-                           else if (i < positionsNorm.Length * 2) stackAmount = 1;
-                           else if (i < positionsNorm.Length * 3) stackAmount = -1;*/
+
                     }
 
                         // possiblePositions only contains indices 0-5
@@ -287,7 +276,6 @@ namespace C2M2.NeuronalDynamics.Interaction
                     preview.loader = loader;
                     preview.PreviewCell(fileName, color);
 
-                    go.tag = "Neuron";
 
 
                 }
@@ -303,9 +291,10 @@ namespace C2M2.NeuronalDynamics.Interaction
                 watcher.EnableRaisingEvents = true;
                 watcher.Created += OnFileCreated;
                 watcher.Deleted += OnFileDelete;
-            }
+                watcher.Renamed += OnFileRename;
+        }
 
-            private void OnFileCreated(object sender, FileSystemEventArgs e)
+        private void OnFileCreated(object sender, FileSystemEventArgs e)
             {
 
                 // Debug.Log($"New file created: {e.FullPath}");
@@ -316,28 +305,54 @@ namespace C2M2.NeuronalDynamics.Interaction
             private void OnFileDelete(object sender, FileSystemEventArgs e)
             {
                 FileInfo fileInfo = new FileInfo(e.FullPath);
-                Debug.Log($"New file deleted: {e.FullPath}");
 
                 var existingFileInfo = files.FirstOrDefault(f => f.FullName == fileInfo.FullName);
+            if (existingFileInfo != null)
+            {
+                files.Remove(existingFileInfo);
+
+
+            }
+            else
+            {
                 var newExistingFileInfo = newFiles.FirstOrDefault(f => f.FullName == fileInfo.FullName);
-                if (existingFileInfo != null)
+                 if (newExistingFileInfo != null)
                 {
-                    Debug.Log("trigger 1");
-                    files.Remove(existingFileInfo);
-
-
-                }
-                else if (newExistingFileInfo != null)
-                {
-                    Debug.Log("trigger 2");
                     newFiles.Remove(newExistingFileInfo);
                 }
             }
+            }
+        private void OnFileRename(object sender, RenamedEventArgs e)
+        {
+           
+            FileInfo oldFileInfo = new FileInfo(e.OldFullPath);
+            FileInfo newFileInfo = new FileInfo(e.FullPath);
 
-            private void Start()
+          
+            var existingFileInfo = files.FirstOrDefault(f => f.FullName == oldFileInfo.FullName);
+            if (existingFileInfo != null)
+            {
+
+                files.Remove(oldFileInfo);
+                files.Add(newFileInfo);
+            }
+            else
+            {
+                var newExistingFileInfo = newFiles.FirstOrDefault(f => f.FullName == oldFileInfo.FullName);
+                if (newExistingFileInfo != null)
+                {
+                    newFiles.Remove(oldFileInfo);
+                    newFiles.Add(newFileInfo);
+                }
+            }
+        }
+
+        private void Start()
             {
                 string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
                 ConfigureFileSystemWatcher(fullPath);
+                GameObject cellobj = GameObject.Find("Arrows");
+                controller = cellobj.GetComponent<CellPreviewerController>();
                 StartCoroutine(DelayedPreviewerStart(0.01f));
                 //generateNeuron();
             }
@@ -348,7 +363,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 // Wait for the specified delay
                 yield return new WaitForSeconds(delayInSeconds);
-                generateNeuron();
+                generateCellPreviewer();
 
             }
 
