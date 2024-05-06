@@ -4,6 +4,8 @@ using C2M2.NeuronalDynamics.Simulation;
 using System.IO;
 using System.Collections.Generic;
 using C2M2.Interaction;
+using System.Linq;
+
 namespace C2M2.NeuronalDynamics.Interaction
 {
     /// <summary>
@@ -107,7 +109,17 @@ namespace C2M2.NeuronalDynamics.Interaction
                 rulerObj.transform.position = rulerInitPos;
                 rulerObj.transform.eulerAngles = rulerInitRot;
                 rulerObj.name = "Ruler";
-                rulerObj.GetComponent<GrabRescaler>().target = GameManager.instance.simulationSpace.transform;
+                
+                GameObject[] pivotObjList = GameObject.FindGameObjectsWithTag("NeuronPivotPoint");
+                if (pivotObjList.Count() == 0)
+                {
+                    GameObject pivotObj = Instantiate(Resources.Load("Prefabs/NeuronPivotPoint") as GameObject);
+                    pivotObj.transform.SetParent(GameManager.instance.simulationSpace.transform);
+                    pivotObj.transform.position = GameManager.instance.simulationSpace.transform.position;
+                    pivotObj.transform.eulerAngles = GameManager.instance.simulationSpace.transform.eulerAngles;
+                    pivotObj.name = "NeuronPivotPoint";
+                    pivotObj.GetComponent<GrabRescaler>().target = GameManager.instance.simulationSpace.transform;
+                }
             }
             solveObj.transform.parent = GameManager.instance.simulationSpace.transform;
             solver.transform.localScale = Vector3.one;
@@ -138,7 +150,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Debug.LogError(e);
                 }
             }
-
+            solveObj.tag = "Neuron";
             return solveObj;
         }
     }
