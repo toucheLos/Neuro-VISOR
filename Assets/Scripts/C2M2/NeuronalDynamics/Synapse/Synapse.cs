@@ -73,36 +73,26 @@ public class Synapse : NDInteractables
     {
         SynapseManager.HoldCount += Time.deltaTime;
         // If we've held the button long enough to destroy, color caps red until user releases button
-        if ((SynapseManager.HoldCount > SynapseManager.DestroyCount) && (SynapseManager.synapseInProgress != null)) SwitchMaterial(destroyMaterial);
+        if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
     }
     
     private void CheckInput()
     {
         // Change model 
-        if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount && (SynapseManager.synapseInProgress != null))
+        if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
         {
             if (SynapseManager.FindSelectedSyn(this).currentModel == Model.GABA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.NMDA);
             else SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
         }
         // Delete synapse
-        else if ((SynapseManager.HoldCount >= SynapseManager.DestroyCount) && (SynapseManager.synapseInProgress != null))
+        else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
         {
             SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
         }
         // Place synapse 
         else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
-            if (SynapseManager.synapseInProgress != null)
-            {
-                if (Time.time - SynapseManager.placementTimestamp >= SynapseManager.PlaceDelay)
-                {
-                    SynapseManager.SynapticPlacement(this);
-                }
-            }
-            else
-            {
-                SynapseManager.SynapticPlacement(this);
-            }
+            SynapseManager.SynapticPlacement(this);
         }
         SynapseManager.HoldCount = 0;
     }
