@@ -10,6 +10,7 @@ public class Synapse : NDInteractables
 
     public Material inhibitoryMat;
     public Material excitatoryMat;
+    public Material prePlaceMat;
     
     public int Id;
 
@@ -60,6 +61,7 @@ public class Synapse : NDInteractables
         float radiusLength = Math.Max(radiusScalingValue, heightScalingValue) * currentVisualizationScale;
         transform.localScale = new Vector3(radiusLength, radiusLength, radiusLength);
         SetToModeMaterial();
+        SynapseManager.PrePlaceCheck(this);
     }
 
     protected override void AddHitEventListeners()
@@ -72,26 +74,36 @@ public class Synapse : NDInteractables
     {
         SynapseManager.HoldCount += Time.deltaTime;
         // If we've held the button long enough to destroy, color caps red until user releases button
-        if (SynapseManager.HoldCount > SynapseManager.DestroyCount) SwitchMaterial(destroyMaterial);
+        if ((SynapseManager.HoldCount > SynapseManager.DestroyCount) && (SynapseManager.synapseInProgress != null)) SwitchMaterial(destroyMaterial);
     }
     
     private void CheckInput()
     {
         // Change model 
-        if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
+        if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount && (SynapseManager.synapseInProgress != null))
         {
             if (SynapseManager.FindSelectedSyn(this).currentModel == Model.GABA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.NMDA);
             else SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
         }
         // Delete synapse
-        else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
+        else if ((SynapseManager.HoldCount >= SynapseManager.DestroyCount) && (SynapseManager.synapseInProgress != null))
         {
             SynapseManager.DeleteSyn(SynapseManager.FindSelectedSyn(this));
         }
         // Place synapse 
         else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
-            SynapseManager.SynapticPlacement(this); 
+            if (SynapseManager.synapseInProgress != null)
+            {
+                if (Time.time - SynapseManager.placementTimestamp >= SynapseManager.PlaceDelay)
+                {
+                    SynapseManager.SynapticPlacement(this);
+                }
+            }
+            else
+            {
+                SynapseManager.SynapticPlacement(this);
+            }
         }
         SynapseManager.HoldCount = 0;
     }
@@ -100,6 +112,11 @@ public class Synapse : NDInteractables
     {
         currentModel = model;
         SetToModeMaterial();
+    }
+
+    public void SetPrePlaceMat()
+    {
+        SwitchMaterial(prePlaceMat);
     }
 
     public void SetToModeMaterial()
