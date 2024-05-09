@@ -59,7 +59,7 @@ namespace C2M2.NeuronalDynamics.Interaction
 
             [Tooltip("If true, positionsNorm will stack above and below on the y axis")]
             public bool stackPos = true;
-            public void generateNeuron()
+            public void generateCellPreviewer()
             {
 
                 // Make sure we have window preview prefab and a pointer to a simulation loader
@@ -137,12 +137,11 @@ namespace C2M2.NeuronalDynamics.Interaction
                     int pageCount = controller.getPage();
                     int cellCount = controller.getCellSize();
                     int startIndex = pageCount * cellCount;
-                    int range = System.Math.Min(cellCount, files.Count - startIndex); //Placed.cellSize was subsituted for 9
+                    int range = System.Math.Min(cellCount, files.Count - startIndex); 
                     if (files.Count == 0) return new List<string> { };
                     List<string> fileNames = new List<string>();
                     if (pageCount != 0)
                     {
-                   // StartCoroutine(delay(startIndex, range));
                         bool success = false;
                         while (!success && pageCount != 0)
                         {
@@ -292,9 +291,10 @@ namespace C2M2.NeuronalDynamics.Interaction
                 watcher.EnableRaisingEvents = true;
                 watcher.Created += OnFileCreated;
                 watcher.Deleted += OnFileDelete;
-            }
+                watcher.Renamed += OnFileRename;
+        }
 
-            private void OnFileCreated(object sender, FileSystemEventArgs e)
+        private void OnFileCreated(object sender, FileSystemEventArgs e)
             {
 
                 // Debug.Log($"New file created: {e.FullPath}");
@@ -307,20 +307,47 @@ namespace C2M2.NeuronalDynamics.Interaction
                 FileInfo fileInfo = new FileInfo(e.FullPath);
 
                 var existingFileInfo = files.FirstOrDefault(f => f.FullName == fileInfo.FullName);
+            if (existingFileInfo != null)
+            {
+                files.Remove(existingFileInfo);
+
+
+            }
+            else
+            {
                 var newExistingFileInfo = newFiles.FirstOrDefault(f => f.FullName == fileInfo.FullName);
-                if (existingFileInfo != null)
-                {
-                    files.Remove(existingFileInfo);
-
-
-                }
-                else if (newExistingFileInfo != null)
+                 if (newExistingFileInfo != null)
                 {
                     newFiles.Remove(newExistingFileInfo);
                 }
             }
+            }
+        private void OnFileRename(object sender, RenamedEventArgs e)
+        {
+           
+            FileInfo oldFileInfo = new FileInfo(e.OldFullPath);
+            FileInfo newFileInfo = new FileInfo(e.FullPath);
 
-            private void Start()
+          
+            var existingFileInfo = files.FirstOrDefault(f => f.FullName == oldFileInfo.FullName);
+            if (existingFileInfo != null)
+            {
+
+                files.Remove(oldFileInfo);
+                files.Add(newFileInfo);
+            }
+            else
+            {
+                var newExistingFileInfo = newFiles.FirstOrDefault(f => f.FullName == oldFileInfo.FullName);
+                if (newExistingFileInfo != null)
+                {
+                    newFiles.Remove(oldFileInfo);
+                    newFiles.Add(newFileInfo);
+                }
+            }
+        }
+
+        private void Start()
             {
                 string fullPath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + cellsPath;
                 ConfigureFileSystemWatcher(fullPath);
@@ -336,7 +363,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             {
                 // Wait for the specified delay
                 yield return new WaitForSeconds(delayInSeconds);
-                generateNeuron();
+                generateCellPreviewer();
 
             }
 
