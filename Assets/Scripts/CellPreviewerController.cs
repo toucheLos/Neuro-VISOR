@@ -26,13 +26,13 @@ public class CellPreviewerController : MonoBehaviour
             Destroy(cellPreviewerObj.transform.GetChild(i).gameObject);
         }
 
-        cellPreviewer.generateCellPreviewer();
+        cellPreviewer.generateNeuron();
         for (int i = 1; i < cellPreviewerObj.transform.childCount; ++i)
         {
             neuronArray.Append(cellPreviewerObj.transform.GetChild(i).gameObject);
         }
     }
-    public void refreshPreviewer()
+    public void pressButton()
     {
        if (cellPreviewer.newFiles.Count > 0)
         {
@@ -40,14 +40,15 @@ public class CellPreviewerController : MonoBehaviour
             {
                 cellPreviewer.files.Add(i);
             }
+            UnityEngine.Debug.Log(cellPreviewer.newFiles.Count);
             cellPreviewer.newFiles.Clear();
             cellPreviewer.files.Sort((file1, file2) => file1.Name.CompareTo(file2.Name));
+            UnityEngine.Debug.Log(cellPreviewer.files.GetRange(0, cellPreviewer.files.Count));
 
         }
        cellSize = cellPreviewerObj.GetComponent<CellPreviewer>().positionsNorm.Length * 3;
         removeNeuroPreview();
         changePageNumbers(Page, (int)Math.Ceiling((double)cellPreviewer.files.Count / cellSize));
-       
     }
     public void changePageNumbers(int currentPage, int maxPage)
     {

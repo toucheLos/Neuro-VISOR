@@ -136,7 +136,6 @@ namespace C2M2.NeuronalDynamics.Visualization.VRN
                     textmesh.color = Color.red;
                     textmesh.text = "Error: Please refresh";
                     
-                    //MonobehaviorHelper.Instance.ResetTextAndColor(textmesh, text, color, 2f);
 
                 }
             }
