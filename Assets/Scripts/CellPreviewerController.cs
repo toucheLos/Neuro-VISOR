@@ -58,7 +58,7 @@ public class CellPreviewerController : MonoBehaviour
                            "<size=100%>{1}</size></align>", currentPage + 1, maxPage);
     }
 
-    public void makePreviewerControlsVisible(bool hide)
+    public static void makePreviewerControlsVisible(bool hide)
     {
         UpArrow.SetActive(hide);
         DownArrow.SetActive(hide);
