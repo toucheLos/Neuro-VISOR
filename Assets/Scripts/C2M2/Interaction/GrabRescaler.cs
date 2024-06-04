@@ -3,8 +3,10 @@ using C2M2.Utils;
 using System.Security.Cryptography;
 using System.Collections.Specialized;
 using System;
+using C2M2.NeuronalDynamics.Interaction;
 using System.Collections.Generic;
 using System.Linq;
+using C2M2.NeuronalDynamics.Simulation;
 
 namespace C2M2.Interaction
 {
@@ -34,7 +36,9 @@ namespace C2M2.Interaction
         public Transform target = null;
         public Vector3 median = Vector3.zero;
         public List<Vector3> neuronPositions = new List<Vector3>(new Vector3[1]);
+        public int lastNeuronCount = 0;
         public GameObject[] neuronList;
+        public NeuronClamp[] clampList;
         private GameObject[] pivotPoints;
         public GameObject pivot;
 
@@ -51,7 +55,7 @@ namespace C2M2.Interaction
         }
 
         ///<returns>A boolean of whether the joystick is pressed</returns>
-        private void VisibilityCheck()
+        private bool VisibilityCheck()
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
             {
@@ -59,6 +63,7 @@ namespace C2M2.Interaction
                 {
                     meshrender.enabled = !meshrender.enabled;
                     pivotcollider.enabled = !pivotcollider.enabled;
+                    return true;
                 }
             }
             else
@@ -67,17 +72,38 @@ namespace C2M2.Interaction
                 {
                     meshrender.enabled = !meshrender.enabled;
                     pivotcollider.enabled = !pivotcollider.enabled;
+                    return true;
                 }
             }
+            return false;
         }
+
+        private bool ClampCheck()
+        {
+            for (int i = 0; i < clampList.Count(); i++)
+            {
+                if (clampList[i].RescaleCheck)
+                {
+                    return true;
+                }
+            }
+            return false;
+            /*
+            if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Clamp) return true;
+            return false;
+            */
+        }
+
+
 
         private void Start()
         {
             // transform refers to the transform of the SimulationSpace object which contains all neurons
-            if (target == null) target = transform;
+            target = GameManager.instance.simulationSpace.transform;
 
             grabbable = GetComponent<OVRGrabbable>();
             meshrender = GetComponent<MeshRenderer>();
+            pivotcollider = GetComponent<SphereCollider>();
 
             pivotPoints = GameObject.FindGameObjectsWithTag("NeuronPivotPoint");
 
@@ -94,7 +120,22 @@ namespace C2M2.Interaction
         {
             // If the rescale buttons aren't pressed, do not rescale
             neuronList = GameObject.FindGameObjectsWithTag("Neuron");
-            if (neuronList.Count() > 1) VisibilityCheck();
+            if (neuronList.Count() - lastNeuronCount >= 1)
+            {
+                if (lastNeuronCount >= 1)
+                {
+                    meshrender.enabled = true;
+                    pivotcollider.enabled = true;
+                }
+                else
+                {
+                    meshrender.enabled = false;
+                    pivotcollider.enabled = false;
+                }
+            }
+            lastNeuronCount = neuronList.Count();
+            clampList = FindObjectsOfType<NeuronClamp>();
+            VisibilityCheck();
             GeometricMedian(target);
             if (!grabbable.isGrabbed && median == median)
             {
@@ -112,6 +153,7 @@ namespace C2M2.Interaction
         {
             // Use of scaleStep ensures pace of changes is consistent regardless of simulation FPS
             float scaleStep = scaler * Time.deltaTime;
+            if (clampList.Count() > 0) if (ClampCheck()) scaleStep = 0f;
             // Equivalent to exponential rescaling of scale by factor of scaleRate*ChangeScaler per frame
             Vector3 newLocalScale = target.localScale*Mathf.Pow(1f + scaleRate*ChangeScaler, scaleStep);
 
@@ -228,7 +270,6 @@ namespace C2M2.Interaction
             }*/
             // After iteration limit, use most recent approximation even if tolerance hasn't been met
             median = tempMedian;
-            Debug.Log("Recalculated Geometric Median");
             return median;
         }
     }

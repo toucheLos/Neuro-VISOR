@@ -22,6 +22,7 @@ namespace C2M2.NeuronalDynamics.Interaction
         [Tooltip("The highlight sphere's radius is some real multiple of the clamp's radius")]
         public float highlightSphereScale = 3f;
         private bool somaClamp = false;
+        public bool RescaleCheck = false;
 
         public bool ClampLive { get; private set; } = false;
 
@@ -253,6 +254,7 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;
 
+            RescaleCheck = true;
             ClampPower += power;
             UpdateColor();
         }
@@ -267,7 +269,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                 }
                 else if (ClampManager.HoldCount > 0) ToggleClamp();
             }
-
+            RescaleCheck = false;
             ClampManager.HoldCount = 0;
             ClampManager.PowerClick = false;
             SwitchCaps(true);
