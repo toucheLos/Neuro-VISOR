@@ -54,7 +54,7 @@ namespace C2M2.Interaction
             }
         }
 
-        ///<returns>A boolean of whether the joystick is pressed</returns>
+        ///<returns>A boolean of whether the visibility toggle key is pressed</returns>
         private bool VisibilityCheck()
         {
             if (GameManager.instance.vrDeviceManager.VRActive)
@@ -78,6 +78,8 @@ namespace C2M2.Interaction
             return false;
         }
 
+        // Checks whether the user is raycasting at a Clamp; disables rescaling functionality if so
+        // Note: Uses the RescaleCheck variable of the Clamp
         private bool ClampCheck()
         {
             for (int i = 0; i < clampList.Count(); i++)
@@ -88,25 +90,20 @@ namespace C2M2.Interaction
                 }
             }
             return false;
-            /*
-            if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Clamp) return true;
-            return false;
-            */
         }
-
-
 
         private void Start()
         {
             // transform refers to the transform of the SimulationSpace object which contains all neurons
             target = GameManager.instance.simulationSpace.transform;
 
+            // Get relevant components to toggle visibility, grabbability, and object colliders
             grabbable = GetComponent<OVRGrabbable>();
             meshrender = GetComponent<MeshRenderer>();
             pivotcollider = GetComponent<SphereCollider>();
 
+            // Get the only NeuronPivotPoint object
             pivotPoints = GameObject.FindGameObjectsWithTag("NeuronPivotPoint");
-
             pivot = pivotPoints[0];
 
             // Set minScale and maxScale limits based on initial scale of the SimulationSpace object
@@ -118,8 +115,9 @@ namespace C2M2.Interaction
 
         void Update()
         {
-            // If the rescale buttons aren't pressed, do not rescale
-            neuronList = GameObject.FindGameObjectsWithTag("Neuron");
+            // Store all loaded Neurons in the simulation into a list
+            neuronList = GameObject.FindGameObjectsWithTag("SimulatedNeuronCell");
+            // Check if a Neuron was added since the last frame, then toggle pivotpoint visibility accordingly
             if (neuronList.Count() - lastNeuronCount >= 1)
             {
                 if (lastNeuronCount >= 1)
@@ -134,15 +132,26 @@ namespace C2M2.Interaction
                 }
             }
             lastNeuronCount = neuronList.Count();
+
+            // Check the list of currently loaded Clamps to see if the user is raycasting towards a clamp
+            // TODO: Create and track this separately by adding Clamps to a universal list as they're generated
             clampList = FindObjectsOfType<NeuronClamp>();
+
+            // Check if the user is toggling the visibility of the pivotpoint object
             VisibilityCheck();
+
+            // Calculate the average point between each simulated Neuron
             GeometricMedian(target);
-            if (!grabbable.isGrabbed && median == median)
+
+            // If the pivotpoint object is not grabbed but the rescaling keys are pressed, rescale the neurons accordingly
+            if (!grabbable.isGrabbed && median != null)
             {
                 SetNeuronParents(target);
                 pivot.transform.position = median;
                 if (ChangeScaler != 0) Rescale();
             }
+            // But if the pivotpoint object is grabbed, disable rescaling and allow movement of all neurons as a group
+            // TODO: Implement the ability to move all neurons as a group by moving the pivotpoint object on Desktop version; need a workaround because there's no "grabbing" on Desktop
             if (grabbable.isGrabbed)
             {
                 SetNeuronParents(pivot.transform);
@@ -163,7 +172,7 @@ namespace C2M2.Interaction
             RelativeScale(target, pivot.transform.position, newLocalScale);
         }
 
-        // Use to rescale transform from a different pivot point
+        // Use to rescale Unity transform object from the perspective of a different pivot point
         private void RelativeScale(Transform target, Vector3 pivotPoint, Vector3 newScale)
         {
             // Calculate offset from pivot point and relative scale factor
@@ -199,7 +208,7 @@ namespace C2M2.Interaction
         ///<returns>The Geometric Median of all of the active neurons</returns>
         private Vector3 GeometricMedian(Transform target)
         {
-            // Update the list of neurons to include all objects tagged "Neuron"
+            // Update the list of neurons to include all objects tagged "SimulatedNeuronCell"
             // TODO: Create and track this in NDSimulationLoader by adding neurons to a list as they're generated
             int activeNeurons = neuronList.Count();
 
@@ -235,7 +244,9 @@ namespace C2M2.Interaction
             }
             tempMedian /= (activeNeurons); // tempMedian is now the average of neuron coordinates
             /*
-            // Implementation of Weiszfeld's Algorithm for iterative numerical approximation of Geometric Median
+            // Below is an implementation of Weiszfeld's Algorithm for iterative numerical approximation of Geometric Median
+            // The current code uses the Geometric Midpoint rather than the Median, but the below code can be uncommented and toggled on as desired
+
             const int maxIterations = 10;
             const float tolerance = 1e-5f;
 
@@ -267,8 +278,10 @@ namespace C2M2.Interaction
                 }
                 // Otherwise store it as the new approximation, and continue to next iteration
                 else tempMedian = newMedian;
+                // After iteration limit, use most recent approximation even if tolerance hasn't been met
             }*/
-            // After iteration limit, use most recent approximation even if tolerance hasn't been met
+
+            // Set median value to the calculated median
             median = tempMedian;
             return median;
         }

@@ -254,7 +254,9 @@ namespace C2M2.NeuronalDynamics.Interaction
             // If clamp power is modified while the user holds a click, don't let the click also toggle/destroy the clamp
             if (power != 0 && !ClampManager.PowerClick) ClampManager.PowerClick = true;
 
+            // RescaleCheck works with GrabRescaler.cs to ensure rescaling is disabled in favor of changing a clamp's voltage
             RescaleCheck = true;
+            
             ClampPower += power;
             UpdateColor();
         }

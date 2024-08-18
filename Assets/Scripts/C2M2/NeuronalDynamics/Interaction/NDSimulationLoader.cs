@@ -150,7 +150,7 @@ namespace C2M2.NeuronalDynamics.Interaction
                     Debug.LogError(e);
                 }
             }
-            solveObj.tag = "Neuron";
+            solveObj.tag = "SimulatedNeuronCell";
             return solveObj;
         }
     }

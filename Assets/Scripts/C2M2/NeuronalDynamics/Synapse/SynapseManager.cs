@@ -106,6 +106,7 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         return false;
     }
 
+    // Handles assignment of PrePlaceMaterial on Synapses that don't yet have an endpoint
     public bool PrePlaceCheck(Synapse syn)
     {
         if (FindSynapsePair(syn) == null)
