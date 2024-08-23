@@ -2,19 +2,16 @@
 using C2M2.NeuronalDynamics.Interaction.UI;
 using UnityEngine;
 
-[RequireComponent(typeof(GrabRescaler))]
 [RequireComponent(typeof(NDLineGraph))]
 public class NDGraph : NDInteractables
 {
     public NDGraphManager GraphManager { get { return simulation.graphManager; } }
 
-    private GrabRescaler grabRescaler;
     public NDLineGraph ndlinegraph;
 
     // Start is called before the first frame update
     void Awake()
     {
-        grabRescaler = GetComponent<GrabRescaler>();
         ndlinegraph = GetComponent<NDLineGraph>();
     }
 
@@ -46,6 +43,5 @@ public class NDGraph : NDInteractables
 
     protected override void AddHitEventListeners()
     {
-        HitEvent.OnHover.AddListener((hit) => grabRescaler.Rescale());
     }
 }

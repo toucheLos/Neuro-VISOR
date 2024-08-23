@@ -24,6 +24,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         private TextMeshProUGUI[] textElements = null;
         CellPreviewerController controller;
 
+
         private bool Minimized
         {
             get
@@ -124,9 +125,13 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                     Destroy(transform.root.gameObject);
                 }
 
-                // Destroy ruler if no cells are left
-                // TODO See NDSimulationLoader for note on ruler generation and removal improvement
-                if (GameManager.instance.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
+                // Destroy ruler and pivot point objects if no cells are left
+                // TODO See NDSimulationLoader for note on supplementary object generation and removal improvement
+                if (GameManager.instance.activeSims.Count == 0)
+                {
+                    Destroy(GameObject.Find("Ruler"));
+                    Destroy(GameObject.Find("NeuronPivotPoint"));
+                }
             }
         }
 

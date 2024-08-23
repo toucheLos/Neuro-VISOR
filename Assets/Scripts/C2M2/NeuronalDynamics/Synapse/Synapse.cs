@@ -10,6 +10,7 @@ public class Synapse : NDInteractables
 
     public Material inhibitoryMat;
     public Material excitatoryMat;
+    public Material prePlaceMat;
     
     public int Id;
 
@@ -81,7 +82,7 @@ public class Synapse : NDInteractables
         if (SynapseManager.HoldCount >= SynapseManager.ChangeCount && SynapseManager.HoldCount <= SynapseManager.DestroyCount)
         {
             if (SynapseManager.FindSelectedSyn(this).currentModel == Model.GABA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.NMDA);
-            else SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
+            else if (SynapseManager.FindSelectedSyn(this).currentModel == Model.NMDA) SynapseManager.ChangeModel(SynapseManager.FindSelectedSyn(this), Model.GABA);
         }
         // Delete synapse
         else if (SynapseManager.HoldCount >= SynapseManager.DestroyCount)
@@ -91,7 +92,7 @@ public class Synapse : NDInteractables
         // Place synapse 
         else if (GameManager.instance.simulationManager.FeatState == NDSimulationManager.FeatureState.Synapse)
         {
-            SynapseManager.SynapticPlacement(this); 
+            SynapseManager.SynapticPlacement(this);
         }
         SynapseManager.HoldCount = 0;
     }
@@ -100,6 +101,11 @@ public class Synapse : NDInteractables
     {
         currentModel = model;
         SetToModeMaterial();
+    }
+
+    public void SetPrePlace()
+    {
+        SwitchMaterial(prePlaceMat);
     }
 
     public void SetToModeMaterial()
