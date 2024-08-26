@@ -248,6 +248,7 @@ to build micro-circuits with realistic signal processing capabilities.
 - Synapses may occasionally break when placed too quickly or too close together; needs more testing to determine exact cause
 - The Cell Previewer's page scrolling buttons disappear when attempting to add a second Neuron into the simulation, making it impossible to load Neurons from different pages
 - Movement of all neurons as a group configuration is not implemented on the Desktop version
+- Pressing "close cell" may result in immediately loading another neuron if the cell previewer loads behind the "close cell" button after the simulation ends
 
 ## Branches
 
@@ -258,7 +259,7 @@ Development: The active beta, contains the latest features but at a higher risk 
 ## Changelog
 
 ### 2.5.0
-Contributors: [Malvin Prifti](https://github.com/ausii), [Brandon Hugger](https://github.com/B-Hugger), [Rujeko Chinomona](https://rujekoc.github.io/)
+Contributors: [Malvin Prifti](https://github.com/ausii), [Brandon Hugger](https://github.com/B-Hugger), [Rujeko Chinomona](https://rujekoc.github.io/), [Zachary Miksis](https://zacharymiksis.com)
 
 - Implemented a Pivot Point object which appears as a white sphere when multiple neurons are loaded
 - Rescaling neurons is smoother, and now rescales them around the Pivot Point object
