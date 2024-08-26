@@ -23,6 +23,9 @@ public abstract class NDInteractablesManager<T> : MonoBehaviour
     // Hold down a raycast for this many seconds to change the synapse model
     public float ChangeCount = .75f;
 
+    // Delay between synapse placements
+    public float PlaceDelay = 1f;
+
     // Start is called before the first frame update
     void Awake()
     {

@@ -8,7 +8,8 @@ public class SynapseManager : NDInteractablesManager<Synapse>
 {
     public GameObject synapsePrefab;
     public GameObject arrowPrefab;
-    private Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
+    public float placementTimestamp;
+    public Synapse synapseInProgress = null; //Contains presynapse when a presynapse has been placed but no post synapse
     public List<(Synapse, Synapse)> synapses = new List<(Synapse, Synapse)>(); //pre (Item1) and post (Item2) synapses
 
     public override GameObject IdentifyBuildPrefab(NDSimulation sim, int index)
@@ -57,13 +58,17 @@ public class SynapseManager : NDInteractablesManager<Synapse>
         if (synapseInProgress == null) //Pre Synapse
         {
             Synapse prePlaced = placedSynapse.Clone();
+            prePlaced.SetPrePlace();
             synapseInProgress = prePlaced;
+            placementTimestamp = Time.time;
         }
         else //Post Synapse
         {
             Synapse postPlaced = placedSynapse.Clone();
             synapses.Add((synapseInProgress, postPlaced));
+            PrePlaceCheck(synapseInProgress);
             synapseInProgress = null;
+
             PlaceArrow();
         }
     }
@@ -97,7 +102,27 @@ public class SynapseManager : NDInteractablesManager<Synapse>
             }
             return true;
         }
-        else return false;
+        else Destroy(syn.gameObject);
+        return false;
+    }
+
+    // Handles assignment of PrePlaceMaterial on Synapses that don't yet have an endpoint
+    public bool PrePlaceCheck(Synapse syn)
+    {
+        if (FindSynapsePair(syn) == null)
+        {
+            syn.SetPrePlace();
+            return true;
+        }
+        else if (FindSynapsePair(syn) != null)
+        {
+            foreach ((Synapse, Synapse) pair in FindSynapsePair(syn))
+            {
+                pair.Item1.SetToModeMaterial();
+                pair.Item2.SetToModeMaterial();
+            }
+        }
+        return false;
     }
 
     public bool ChangeModel(Synapse syn, Synapse.Model model)

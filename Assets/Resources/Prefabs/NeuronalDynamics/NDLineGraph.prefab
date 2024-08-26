@@ -2740,7 +2740,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
-      - m_Target: {fileID: 8198696467454360633}
+      - m_Target: {fileID: 0}
         m_MethodName: Rescale
         m_Mode: 1
         m_Arguments:
@@ -7116,7 +7116,6 @@ GameObject:
   - component: {fileID: 2168964937537411967}
   - component: {fileID: 2168964937537411965}
   - component: {fileID: 2168964937537411962}
-  - component: {fileID: 8198696467454360633}
   - component: {fileID: 4932199581192497660}
   m_Layer: 12
   m_Name: NDLineGraph
@@ -7259,6 +7258,7 @@ MonoBehaviour:
   yMinLabel: {fileID: 2168964936445175920}
   yMaxLabel: {fileID: 2168964936027736413}
   positions: []
+  ndgraph: {fileID: 0}
 --- !u!65 &2168964937537411967
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7306,30 +7306,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8198696467454360633
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2168964937537411963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fd8b6f922b3f0147b59e7daa8f4ee0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scaler: 0.2
-  minPercentage: 0
-  maxPercentage: Infinity
-  xScale: 1
-  yScale: 1
-  zScale: 1
-  vrThumbstick: 32768
-  vrThumbstickS: 8388608
-  incKey: 273
-  decKey: 274
-  resetKey: 114
-  target: {fileID: 0}
 --- !u!114 &4932199581192497660
 MonoBehaviour:
   m_ObjectHideFlags: 0
