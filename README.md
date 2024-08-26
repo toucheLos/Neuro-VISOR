@@ -165,7 +165,7 @@ The board also contains a play/pause button. The user can use this to pause solv
 
 <img src="https://i.imgur.com/XEvBssG.png" alt="pivot point" width="175" align="right">
 
-### Pivot Point object
+### Pivot point object
 A pivot point object is created when multiple neurons are present in the simulation. The pivot point object is represented as a white sphere, and is always located at the midpoint of all cell geometries. While grabbing the pivot point object, the cell geometries can be moved as a group.
 
 When not grabbing the pivot point object, users can utilize the Scale Objects controls in order to rescale the objects within the simulation.
