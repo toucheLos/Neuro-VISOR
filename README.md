@@ -25,7 +25,7 @@ This project is produced at the Center for Computational Mathematics and Modelin
 
 Project Leads: [Dr. Benjamin Seibold](https://math.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://math.temple.edu/~tug29557/about-gillian-queisser.html)
 
-Researchers and Developers: [Rujeko Chinomona](https://rujekoc.github.io/)
+Researchers and Developers: [Rujeko Chinomona](https://rujekoc.github.io/), [Zachary Miksis](https://zacharymiksis.com/)
 
 ## Code Documentation
 Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <seibold@temple.edu>.
