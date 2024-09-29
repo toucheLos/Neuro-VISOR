@@ -15,7 +15,9 @@ permissions and limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
+using UnityEngine.XR;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// This is a simple behavior that can be attached to a parent of the CameraRig in order
@@ -84,8 +86,22 @@ public class OVRDebugHeadController : MonoBehaviour
 			transform.position += fwdMove + strafeMove;
 		}
 
-#if UNITY_2017_2_OR_NEWER
-		if ( !UnityEngine.XR.XRDevice.isPresent && ( AllowYawLook || AllowPitchLook ) )
+#if UNITY_2019_3_OR_NEWER
+    // Use XRDisplaySubsystem for newer versions of Unity (2019.3+)
+    var xrDisplaySubsystems = new List<XRDisplaySubsystem>();
+    SubsystemManager.GetInstances(xrDisplaySubsystems);
+
+    bool isXrPresent = false;
+    foreach (var xrDisplaySubsystem in xrDisplaySubsystems)
+    {
+        if (xrDisplaySubsystem.running)
+        {
+            isXrPresent = true;
+            break;
+        }
+    }
+
+    if (!isXrPresent && (AllowYawLook || AllowPitchLook))
 #else
 		if ( !UnityEngine.VR.VRDevice.isPresent && ( AllowYawLook || AllowPitchLook ) )
 #endif

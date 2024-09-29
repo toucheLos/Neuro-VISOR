@@ -15,9 +15,14 @@ permissions and limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
-using VR = UnityEngine.VR;
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_2017_2_OR_NEWER
+using UnityEngine.XR;
+#elif UNITY_2017_1_OR_NEWER
+using VR = UnityEngine.Experimental.VR;
+#endif
 
 /// <summary>
 /// Shows the Oculus plaform UI.

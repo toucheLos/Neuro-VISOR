@@ -17,6 +17,7 @@ permissions and limitations under the License.
 using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using UnityEngine.XR;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -160,8 +161,23 @@ public class OVRDisplay
 	/// </summary>
 	public void RecenterPose()
 	{
-#if UNITY_2017_2_OR_NEWER
-        UnityEngine.XR.InputTracking.Recenter();
+#if UNITY_2019_3_OR_NEWER
+        var xrInputSubsystems = new List<XRInputSubsystem>();
+        SubsystemManager.GetInstances(xrInputSubsystems);
+
+        // Try to recenter using the available XRInputSubsystems
+        foreach (var xrInputSubsystem in xrInputSubsystems)
+        {
+            if (xrInputSubsystem != null && xrInputSubsystem.running)
+            {
+                bool success = xrInputSubsystem.TryRecenter();
+                if (success)
+                {
+                    Debug.Log("Successfully recentered the XR device");
+                    break;
+                }
+            }
+        }
 #else
 		UnityEngine.VR.InputTracking.Recenter();
 #endif

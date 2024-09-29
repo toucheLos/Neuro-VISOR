@@ -360,8 +360,10 @@ public class OVRLint : EditorWindow
 			}, null, false, "Fix");
 		}
 #endif
+// Line to berid 'Player Settings error'
+#if UNITY_2019_3_OR_NEWER
 
-#if UNITY_2017_3_OR_NEWER && !UNITY_ANDROID
+#elif UNITY_2017_3_OR_NEWER && !UNITY_ANDROID
 		if (!PlayerSettings.VROculus.dashSupport)
 		{
 			AddFix("Enable Dash Integration", "We recommend to enable Dash Integration for better user experience.", delegate (UnityEngine.Object obj, bool last, int selected)
@@ -864,15 +866,18 @@ public class OVRLint : EditorWindow
 			AudioImporter importer = AssetImporter.GetAtPath(assetPath) as AudioImporter;
 			if (importer != null)
 			{
-				if (preload != importer.preloadAudioData)
-				{
-					importer.preloadAudioData = preload;
 
-					AssetDatabase.ImportAsset(assetPath);
-					if (refreshImmediately)
-					{
-						AssetDatabase.Refresh();
-					}
+				AudioImporterSampleSettings settings = importer.defaultSampleSettings;
+
+				settings.preloadAudioData = preload;
+
+				importer.defaultSampleSettings = settings;
+
+				AssetDatabase.ImportAsset(assetPath);
+				
+				if (refreshImmediately)
+				{
+					AssetDatabase.Refresh();
 				}
 			}
 		}

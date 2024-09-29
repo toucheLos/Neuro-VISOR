@@ -17,7 +17,12 @@ permissions and limitations under the License.
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using VR = UnityEngine.VR;
+
+#if UNITY_2017_2_OR_NEWER
+using UnityEngine.XR;
+#elif UNITY_2017_1_OR_NEWER
+using VR = UnityEngine.Experimental.VR;
+#endif
 
 /// <summary>
 /// An infrared camera that tracks the position of a head-mounted display.

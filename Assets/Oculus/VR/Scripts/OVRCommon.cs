@@ -19,6 +19,7 @@ permissions and limitations under the License.
 #endif
 
 using UnityEngine;
+using UnityEngine.XR;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -281,7 +282,17 @@ public static class OVRNodeStateProperties
 			return currentDisplaySubsystem.running;				//In 2019.3, this should be changed to currentDisplaySubsystem.isConnected, but this is a fine placeholder for now.
 		return false;
 #else
-		return Device.isPresent;
+		// Replaced Device.isPresent
+		var xrDisplaySubsystems = new List<XRDisplaySubsystem>();
+		SubsystemManager.GetInstances<XRDisplaySubsystem>(xrDisplaySubsystems);
+		foreach (var xrDisplay in xrDisplaySubsystems)
+		{
+			if (xrDisplay.running)
+			{
+				return true;
+			}
+		}
+		return false;
 #endif
 	}
 

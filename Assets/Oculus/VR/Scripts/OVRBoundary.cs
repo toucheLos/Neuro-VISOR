@@ -18,12 +18,19 @@ permissions and limitations under the License.
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VR = UnityEngine.VR;
 using System.Runtime.InteropServices;
-#if UNITY_2017_2_OR_NEWER
+
+#if UNITY_2020_1_OR_NEWER
+using UnityEngine.XR;
+
+#elif UNITY_2017_2_OR_NEWER
 using Boundary = UnityEngine.Experimental.XR.Boundary;
+using UnityEngine.XR;
+
 #elif UNITY_2017_1_OR_NEWER
 using Boundary = UnityEngine.Experimental.VR.Boundary;
+using UnityEngine.Experimental.VR;
+
 #endif
 
 /// <summary>
@@ -70,11 +77,22 @@ public class OVRBoundary
 			return OVRPlugin.GetBoundaryConfigured();
 		else
 		{
-#if UNITY_2017_1_OR_NEWER
-			return Boundary.configured;
-#else
+		#if UNITY_2020_1_OR_NEWER
+			List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+			SubsystemManager.GetInstances(subsystems);
+			foreach (var subsystem in subsystems)
+			{
+				if (subsystem.GetTrackingOriginMode() != TrackingOriginModeFlags.Unknown)
+				{
+					return true;
+				}
+			}
 			return false;
-#endif
+		#elif UNITY_2017_1_OR_NEWER
+			return Boundary.configured;
+		#else
+			return false;
+		#endif
 		}
 	}
 
@@ -129,15 +147,28 @@ public class OVRBoundary
 	{
 		if (OVRManager.loadedXRDevice != OVRManager.XRDevice.Oculus)
 		{
-#if UNITY_2017_1_OR_NEWER
+		#if UNITY_2020_1_OR_NEWER
+			List<Vector3> boundaryPoints = new List<Vector3>();
+			List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+			SubsystemManager.GetInstances(subsystems);
+			foreach (var subsystem in subsystems)
+			{
+				if (subsystem.TryGetBoundaryPoints(boundaryPoints))
+				{
+					return boundaryPoints.ToArray();
+				}
+			}
+			return new Vector3[0];
+		#elif UNITY_2017_1_OR_NEWER
 			if (Boundary.TryGetGeometry(cachedGeometryList, (boundaryType == BoundaryType.PlayArea) ? Boundary.Type.PlayArea : Boundary.Type.TrackedArea))
 			{
 				Vector3[] arr = cachedGeometryList.ToArray();
 				return arr;
 			}
-#endif
+		#else
 			Debug.LogError("This functionality is not supported in your current version of Unity.");
 			return null;
+		#endif
 		}
 
 		int pointsCount = 0;
@@ -183,18 +214,55 @@ public class OVRBoundary
 	public Vector3 GetDimensions(OVRBoundary.BoundaryType boundaryType)
 	{
 		if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+		{
+			// Use Oculus-specific API for dimensions
 			return OVRPlugin.GetBoundaryDimensions((OVRPlugin.BoundaryType)boundaryType).FromVector3f();
-
+		}
 		else
 		{
-#if UNITY_2017_1_OR_NEWER
+			#if UNITY_2020_1_OR_NEWER
+			// Use XR Plugin Management in Unity 2020+ for boundary points and dimensions
+			List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+			SubsystemManager.GetInstances(subsystems);
+			
+			foreach (var subsystem in subsystems)
+			{
+				List<Vector3> boundaryPoints = new List<Vector3>();
+				
+				if (subsystem.TryGetBoundaryPoints(boundaryPoints) && boundaryPoints.Count > 0)
+				{
+					// Calculate the boundary size by finding the max and min points
+					Vector3 minPoint = boundaryPoints[0];
+					Vector3 maxPoint = boundaryPoints[0];
+					
+					foreach (var point in boundaryPoints)
+					{
+						minPoint = Vector3.Min(minPoint, point);
+						maxPoint = Vector3.Max(maxPoint, point);
+					}
+					
+					Vector3 dimensions = maxPoint - minPoint;
+					return new Vector3(dimensions.x, 0, dimensions.z); // Assuming x and z are the dimensions
+				}
+			}
+			return Vector3.zero;
+
+			#elif UNITY_2017_1_OR_NEWER
+			// Fallback for Unity 2017-2019 using the older Boundary API
 			Vector3 dimensions;
 			if (Boundary.TryGetDimensions(out dimensions, (boundaryType == BoundaryType.PlayArea) ? Boundary.Type.PlayArea : Boundary.Type.TrackedArea))
+			{
 				return dimensions;
-#endif
+			}
 			return Vector3.zero;
+
+			#else
+			return Vector3.zero;
+			#endif
 		}
 	}
+
+
 
 	/// <summary>
 	/// Returns true if the boundary system is currently visible.
@@ -205,11 +273,22 @@ public class OVRBoundary
 			return OVRPlugin.GetBoundaryVisible();
 		else
 		{
-#if UNITY_2017_1_OR_NEWER
-			return Boundary.visible;
-#else
+		#if UNITY_2020_1_OR_NEWER
+			List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+			SubsystemManager.GetInstances(subsystems);
+			foreach (var subsystem in subsystems)
+			{
+				if (subsystem.GetTrackingOriginMode() == TrackingOriginModeFlags.Floor)
+				{
+					return true;
+				}
+			}
 			return false;
-#endif
+		#elif UNITY_2017_1_OR_NEWER
+			return Boundary.visible;
+		#else
+			return false;
+		#endif
 		}
 	}
 
@@ -220,12 +299,24 @@ public class OVRBoundary
 	public void SetVisible(bool value)
 	{
 		if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+		{
 			OVRPlugin.SetBoundaryVisible(value);
+		}
 		else
 		{
-#if UNITY_2017_1_OR_NEWER
+		#if UNITY_2020_1_OR_NEWER
+			// In Unity 2020+, use the XRInputSubsystem to handle boundary visibility
+			List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+			SubsystemManager.GetInstances(subsystems);
+
+			foreach (var subsystem in subsystems)
+			{
+				subsystem.TrySetTrackingOriginMode(value ? TrackingOriginModeFlags.Floor : TrackingOriginModeFlags.Unknown);
+			}
+
+		#elif UNITY_2017_1_OR_NEWER
 			Boundary.visible = value;
-#endif
+		#endif
 		}
 	}
 }
