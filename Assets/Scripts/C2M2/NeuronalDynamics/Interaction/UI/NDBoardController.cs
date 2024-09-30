@@ -22,6 +22,7 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
         public GameObject minimizedBackground;
 
         private TextMeshProUGUI[] textElements = null;
+        CellPreviewerController controller;
 
 
         private bool Minimized
@@ -118,14 +119,19 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
                 {
                     // Reenable the cell previewer
                     GameManager.instance.cellPreviewer.SetActive(true);
-
+                    //Reenable the cell previewer controls
+                    CellPreviewerController.makePreviewerControlsVisible(true);
                     // Destroy this control panel
                     Destroy(transform.root.gameObject);
                 }
 
-                // Destroy ruler if no cells are left
-                // TODO See NDSimulationLoader for note on ruler generation and removal improvement
-                if (GameManager.instance.activeSims.Count == 0) Destroy(GameObject.Find("Ruler"));
+                // Destroy ruler and pivot point objects if no cells are left
+                // TODO See NDSimulationLoader for note on supplementary object generation and removal improvement
+                if (GameManager.instance.activeSims.Count == 0)
+                {
+                    Destroy(GameObject.Find("Ruler"));
+                    Destroy(GameObject.Find("NeuronPivotPoint"));
+                }
             }
         }
 
@@ -138,7 +144,8 @@ namespace C2M2.NeuronalDynamics.Interaction.UI
             }
             defaultBackground.SetActive(!minimize);
             minimizedBackground.SetActive(minimize);
-
+            //make cell previewer controls nonvisible
+            CellPreviewerController.makePreviewerControlsVisible(false);
             // Ensure cell previewer is not present if board is expanded 
             if (!minimize) GameManager.instance.cellPreviewer.SetActive(false);
         }

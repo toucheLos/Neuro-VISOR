@@ -1,20 +1,16 @@
 # Neuro-VISOR
 
-<img src="https://user-images.githubusercontent.com/18742217/124176541-01268180-da7d-11eb-825c-935e2edb6aa7.jpg" alt="Neuro-VISOR in action" width="19%" align="right">
+<img src="https://user-images.githubusercontent.com/18742217/124176541-01268180-da7d-11eb-825c-935e2edb6aa7.jpg" alt="Neuro-VISOR in action" width="20%" align="right">
 
 VISOR (Virtual Interactive Simulation Of Reality) is a research and software theme developed by Temple University's [Center for Computational Mathematics and Modeling (C2M2)](https://c2m2.cst.temple.edu/), College of Science and Technology. The overarching long-term vision is to produce novel concepts and software that enable efficient immersed virtual reality (VR) visualization and real-time interaction with simulations of real-world processes described via principled mathematical equations. Unlike traditional high performance computing (HPC) applications, the philosophy of VISOR is that (a) the simulation runs while it is visualized in a virtual environment, and (b) the simulation continues even when the user affects and/or modifies the system state or its conditions.
 
 Neuro-VISOR focuses on applications in computational neuroscience. Specifically, it provides a pipeline that (a) retrieves a wire-frame neuron geometry file from the public neuron database [NeuroMorpho](http://neuromorpho.org/), and (b) generates a surface mesh from it. This mesh is then (c) visualized in VR, while an efficient numerical method approximates the Hodgkin-Huxley model on the given wire-frame neuron geometry. Finally, while the running simulation is fed to the VR environment in real time, (d) the user can interact with the surface mesh and affect the simulation while it is running via several methods outlined under [controls](#controls).
 
-<img src="https://github.com/c2m2/Neuro-VISOR/assets/18742217/3ace8747-01d2-449a-af37-ba69c7eff87b" alt="Neuro-VISOR at conference" width="30%" align="right">
+<img src="https://i.imgur.com/ckL3pW5.png" alt="Raycasting and grabbing" width="50%" align="right">
 
 A key use case of this framework is that is can rapidly accelerate scientific discovery by providing an immediate and very intuitive feedback to the user about how changes to the simulated system affect the system's behavior. This insight, obtained from the simple and fast models used for VISOR, can then enable the computational scientist to devise significantly more targeted (non-interactive) simulations on large-scale HPC clusters of more complex models. In addition, in the context of neuroscience, the immersed 3D environment provides a more intuitive way to navigate and comprehend complex neuron geometries than traditional visualizations on computer screens.
 
-The Neuro-VISOR software can be run in a VR version (currently for Oculus), as well as via a desktop version (without VR headset). While the desktop version does not provide the 3D visualization of the VR version, it does provide all of the same interactive real-time simulation capabilities.
-
-Neuro-VISOR has been used at multiple venues, including teaching/education (undergraduate neuroscience course at Temple University), scientific conferences (Mid-Atlantic Numerical Analysis Day, Latest trends and insights into matrix theory, iterative methods, and preconditioning), research symposia, and public events.
-
-<img src="https://i.imgur.com/ckL3pW5.png" alt="Raycasting and grabbing" width="50%" align="right">
+The Neuro-VISOR software can be run in a VR version (currently only for Oculus), as well as via a desktop version (without VR headset). While the desktop version does not provide the 3D visualization of the VR version, it does provide all of the same interactive real-time simulation capabilities.
 
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ac2c4122b3174e4a8209ef2e791792b3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=c2m2/virtual-reality&amp;utm_campaign=Badge_Grade)
@@ -29,7 +25,7 @@ This project is produced at the Center for Computational Mathematics and Modelin
 
 Project Leads: [Dr. Benjamin Seibold](https://math.temple.edu/~seibold/) [(Github)](https://github.com/benjaminseibold), [Dr. Gillian Queisser](https://math.temple.edu/~tug29557/about-gillian-queisser.html)
 
-Researchers and Developers: [Rujeko Chinomona](https://rujekoc.github.io/)
+Researchers and Developers: [Rujeko Chinomona](https://rujekoc.github.io/), [Zachary Miksis](https://zacharymiksis.com/)
 
 ## Code Documentation
 Our [code documentation](https://c2m2.github.io/doxyhtml/index.html) is generated using [Doxygen](https://www.doxygen.nl/index.html). The completeness of this documentation is dependent on code commenting, so there may be gaps and imperfections. If you notice issues with this documentation, please report it to <seibold@temple.edu>.
@@ -130,8 +126,8 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | Interact | Raycast + (P/H) Index trigger  | (P/H) Left mouse button |
 | Grab | (H) Hand trigger | (H) Right mouse button |
 | Reset Position | Grab + (P) Thumbstick | Raycast + 'X' key |
-| Scale Object | Grab Ruler + Thumbstick up/down | Raycast Ruler + up/down arrow keys |
-| Reset Scale | Grab Ruler + (P) Thumbstick | Raycast Ruler + 'R' key |
+| Scale Objects | Thumbstick up/down | Up/Down arrow keys |
+| Toggle Pivot Point | (P) 'X' on Left Controller | 'R' key |
 | Move Camera | Walk around! | WASD |
 | Rotate Camera | Look around! | (H) Left-Ctrl + move mouse cursor |
 | Quit | Oculus button | Escape key |
@@ -142,7 +138,7 @@ are used analogously throughout the project, as are the terms 'Index Trigger' an
 | (H) | Hold button down |
 
 ### Selecting a Cell
-<img src="https://i.imgur.com/knL8vTZ.png" alt="cell previewer" width="500" align="right">
+<img src="https://i.imgur.com/bqzrS1E.png" alt="cell previewer" width="500" align="right">
 
 1. A cell previewer stands against the whiteboard near the window. It attempts to render the 1D mesh of any neuron `.vrn` cell file archives found in `StreamingAssets/NeuronalDynamics/Geometries`. Six example cells are included with this repo. Several more cells can be found [here](https://drive.google.com/drive/folders/1kyz8S-txISfarPegJSMzABrF_UprH3Y-?usp=sharing).
 2. Enable raycast mode. The hand with raycast mode enabled should be constantly pointing forward.
@@ -157,7 +153,7 @@ The cell can be grabbed by hovering your hand over the 3D geometry and pressing 
 While grabbing a cell, hold the thumbstick up or down on the hand that is being used to grab the cell to resize the cell in world space. Note: this does not affect the environment of the solver code: the cell can be scaled freely in world space without affecting the stored vertex positions of the 1D or 3D meshes.
 
 ### Board Info and Controls
-<img src="https://i.imgur.com/v7gbFza.png" alt="board controls" width="500" align="right">
+<img src="https://i.imgur.com/tKyE0RO.png" alt="board controls" width="250" align="right">
 
 A large user interface is spawned upon selecting a cell. This board contains useful static information about the cell.
 
@@ -167,12 +163,17 @@ The board contains a subpanel for selecting the type of interaction. The user ca
 
 The board also contains a play/pause button. The user can use this to pause solver code at the current time step. Beneath is displayed the current simulation time.
 
-<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="75" align="right">
+<img src="https://i.imgur.com/XEvBssG.png" alt="pivot point" width="175" align="right">
+
+### Pivot point object
+A pivot point object is created when multiple neurons are present in the simulation. The pivot point object is represented as a white sphere, and is always located at the midpoint of all cell geometries. While grabbing the pivot point object, the cell geometries can be moved as a group.
+
+When not grabbing the pivot point object, users can utilize the Scale Objects controls in order to rescale the objects within the simulation.
+
+<img src="https://i.imgur.com/acM7ogE.png" alt="ruler" width="50" align="right">
 
 ### Ruler controls
-A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. While grabbing the ruler, resize it by moving the thumbstick up or down on the hand that is being used to grab the ruler.
-
-The measurements on the ruler will adapt to the world-space size of the geometry so that it can always act as a translator between the size of the cell in the user's space and the local length scales of the neuron.
+A ruler is spawned with every cell geometry. The ruler can be used to understand the length scale of the cell in its local space. The measurements on the ruler will adapt to the world-space size of the geometry so that it can always act as a translator between the size of the cell in the user's space and the local length scales of the neuron.
 
 ### Direct cell interaction
 With raycast mode enabled, point at the surface of the geometry. A blue line should be drawn between your pointer finger and the surface of the geometry. Tap the geometry from up close, or press the Interact button from a distance to directly alter simulation value at the nearest 1D vertex to the point of interaction. The guide line should turn orange upon pressing, and the surface of the geometry should change color to reflect the affected potential at the nearest 1D vertex on the geometry.
@@ -241,10 +242,13 @@ to build micro-circuits with realistic signal processing capabilities.
 
 ## Known Issues Log
 
-- The programs freezes while a new neuron loads in
+- The program freezes while a new neuron loads in
 - Adding in a neuron while the simulation is paused, makes it appear white and buggy (resuming the simulation will fix this)
 - Changing the color scale introduces various bugs
-- The joystick is very sensitive when rescaling neuron
+- Synapses may occasionally break when placed too quickly or too close together; needs more testing to determine exact cause
+- The Cell Previewer's page scrolling buttons disappear when attempting to add a second Neuron into the simulation, making it impossible to load Neurons from different pages
+- Movement of all neurons as a group configuration is not implemented on the Desktop version
+- Pressing "close cell" may result in immediately loading another neuron if the cell previewer loads behind the "close cell" button after the simulation ends
 
 ## Branches
 
@@ -252,9 +256,17 @@ Master: The latest stable version of the project
 
 Development: The active beta, contains the latest features but at a higher risk of bugs
 
-multiHeadsetsSupport: Based off of 2.0.0, adds rudimentary support for all headsets
-
 ## Changelog
+
+### 2.5.0
+Contributors: [Malvin Prifti](https://github.com/ausii), [Brandon Hugger](https://github.com/B-Hugger), [Rujeko Chinomona](https://rujekoc.github.io/), [Zachary Miksis](https://zacharymiksis.com)
+
+- Implemented a Pivot Point object which appears as a white sphere when multiple neurons are loaded
+- Rescaling neurons is smoother, and now rescales them around the Pivot Point object
+- Users can grab the Pivot Point object in VR to move all neurons around as a group
+- Cell Previewer now has multiple pages and the ability to load new .vrn files while the simulation is running
+- Presynaptic vertices now use a pink material until the user places a corresponding postsynaptic vertex
+- Minor improvements to the way objects are generated within the simulation
 
 ### 2.1.1
 Contributors: [Brandon Calia](https://github.com/brandoncalia), [Rujeko Chinomona](https://rujekoc.github.io/)

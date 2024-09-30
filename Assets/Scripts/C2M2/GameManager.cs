@@ -137,6 +137,7 @@ namespace C2M2
 
         private void Update()
         {
+
             if(logQ != null && logQ.Count > 0)
             { // print every queued statement
                 foreach (string s in logQ) { Debug.Log(s); }
