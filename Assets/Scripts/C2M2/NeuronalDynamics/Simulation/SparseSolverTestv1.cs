@@ -6,6 +6,7 @@ using Vector = MathNet.Numerics.LinearAlgebra.Vector<double>;
 using CSparse.Storage;
 using CSparse.Double.Factorization;
 using CSparse;
+using IonChannel;
 using C2M2.Utils;
 using C2M2.NeuronalDynamics.UGX;
 namespace C2M2.NeuronalDynamics.Simulation
@@ -302,7 +303,7 @@ namespace C2M2.NeuronalDynamics.Simulation
                 voltageThreshold = -0.05;
             }
 
-            if ((presynVoltage >= voltageThreshold) && (presynVoltage0< voltageThreshold))
+            if ((presynVoltage >= voltageThreshold) && (presynVoltage0 < voltageThreshold))
             { newVal.Item1.ActivationTime = GetSimulationTime(); }
                                    
             // if the presynapse is below a threshold, then the synapse is INACTIVE
@@ -378,6 +379,31 @@ namespace C2M2.NeuronalDynamics.Simulation
             // if loading, the values from file will be set in BuildVectors and Set1DValues
             if (!g.Loading) InitializeNeuronCell();
             else BuildVectors(g.U, g.M, g.N, g.H, g.Upre, g.Mpre, g.Npre, g.Hpre);
+
+  
+            // Define alpha and beta functions for the gating variable (example for potassium channel)
+            Func<double, double> alpha_n = (voltage) => 0.01 * (voltage + 55) / (1 - Math.Exp(-(voltage + 55) / 10));
+            Func<double, double> beta_n = (voltage) => 0.125 * Math.Exp(-(voltage + 65) / 80);
+
+            // Create a gating variable for potassium channel (n gate)
+            GatingVariable potassiumGate = new GatingVariable("n", alpha_n, beta_n)
+            {
+                Coefficients = new List<double> { 1.0 }
+            };
+
+            // Create the potassium ion channel
+            IonChannel potassiumChannel = new IonChannel("Potassium", , ); 
+
+            // Add the gating variable to the potassium channel
+            potassiumChannel.AddGatingVariable(potassiumGate);
+
+            // Calculate the current at a certain voltage
+            double voltage = -65;
+            double current = potassiumChannel.CalculateCurrent(voltage);
+            
+            Console.WriteLine($"Potassium channel current at {voltage} mV: {current} A");
+    
+
 
             ///<c>R</c> this is the reaction vector for the reaction solve
             R = Vector.Build.Dense(Neuron.nodes.Count);            
@@ -513,6 +539,8 @@ namespace C2M2.NeuronalDynamics.Simulation
                 U_Active = U.Clone();
             }
             Upre = U_Active.Clone();
+
+
 
             M = Vector.Build.Dense(Neuron.nodes.Count, mi);
             N = Vector.Build.Dense(Neuron.nodes.Count, ni);

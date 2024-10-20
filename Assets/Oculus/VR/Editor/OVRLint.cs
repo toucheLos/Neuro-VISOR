@@ -656,7 +656,7 @@ public class OVRLint : EditorWindow
 		}
 
 		// Check that the minSDKVersion meets requirement, 21 for Gear and Go, 23 for Quest
-		AndroidSdkVersions recommendedAndroidMinSdkVersion = AndroidSdkVersions.AndroidApiLevel21;
+		AndroidSdkVersions recommendedAndroidMinSdkVersion = AndroidSdkVersions.AndroidApiLevel22;
 		if (OVRDeviceSelector.isTargetDeviceQuest)
 		{
 			recommendedAndroidMinSdkVersion = AndroidSdkVersions.AndroidApiLevel23;
@@ -743,7 +743,7 @@ public class OVRLint : EditorWindow
 
 		var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
 
-		int maxTextureSize = 1024 * (1 << QualitySettings.masterTextureLimit);
+		int maxTextureSize = 1024 * (1 << QualitySettings.globalTextureMipmapLimit);
 		maxTextureSize = maxTextureSize * maxTextureSize;
 
 		for (int i = 0; i < textures.Length; ++i)
