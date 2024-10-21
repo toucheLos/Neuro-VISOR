@@ -6,14 +6,14 @@ public class GatingVariable
     public Func<double, double> Alpha { get; set; }
     public Func<double, double> Beta { get; set; }
     public string Name { get; set; }
-    public List<double> Coefficients { get; set; }
+    public List<double> ChannelConstants { get; set; }
 
     public GatingVariable(string name, Func<double, double> alpha, Func<double, double> beta)
     {
         Name = name;
         Alpha = alpha;
         Beta = beta;
-        Coefficients = new List<double>();
+        ChannelConstants = new List<double>();
     }
 }
 
